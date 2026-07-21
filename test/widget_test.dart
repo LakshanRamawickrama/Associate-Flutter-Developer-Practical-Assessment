@@ -1,30 +1,98 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:product_catalogue/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:product_catalogue/core/theme/theme_provider.dart';
+import 'package:product_catalogue/data/models/product.dart';
+import 'package:product_catalogue/data/repositories/product_repository.dart';
+import 'package:product_catalogue/data/services/storage_service.dart';
+import 'package:product_catalogue/presentation/providers/product_provider.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  group('ProductModel & Provider Unit Tests', () {
+    test('Product.fromJson parses valid JSON data correctly', () {
+      final json = {
+        'id': 100,
+        'title': 'Test Backpack',
+        'price': 49.99,
+        'description': 'A durable test backpack',
+        'category': 'accessories',
+        'image': 'https://example.com/image.jpg',
+        'rating': {'rate': 4.5, 'count': 88}
+      };
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+      final product = Product.fromJson(json);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+      expect(product.id, 100);
+      expect(product.title, 'Test Backpack');
+      expect(product.price, 49.99);
+      expect(product.category, 'accessories');
+      expect(product.rating.rate, 4.5);
+      expect(product.isFavourite, false);
+    });
+
+    test('ProductProvider search filtering works for substring matching', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storageService = StorageService(prefs);
+      final repository = ProductRepository();
+
+      final provider = ProductProvider(
+        repository: repository,
+        storageService: storageService,
+      );
+
+      await provider.loadProducts();
+
+      expect(provider.status, ProductStatus.success);
+      expect(provider.filteredProducts.isNotEmpty, true);
+
+      // Search matching "backpack"
+      provider.setSearchQuery('backpack');
+      expect(
+        provider.filteredProducts.every(
+          (p) => p.title.toLowerCase().contains('backpack') || p.category.toLowerCase().contains('backpack'),
+        ),
+        true,
+      );
+    });
+
+    test('ProductProvider favourite toggling and persistence work', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storageService = StorageService(prefs);
+      final repository = ProductRepository();
+
+      final provider = ProductProvider(
+        repository: repository,
+        storageService: storageService,
+      );
+
+      await provider.loadProducts();
+
+      expect(provider.isFavourite(1), false);
+      await provider.toggleFavourite(1);
+      expect(provider.isFavourite(1), true);
+
+      // Verify persistence in storage
+      expect(storageService.getFavouriteProductIds().contains(1), true);
+
+      await provider.toggleFavourite(1);
+      expect(provider.isFavourite(1), false);
+      expect(storageService.getFavouriteProductIds().contains(1), false);
+    });
+
+    test('ThemeProvider toggles light and dark modes', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storageService = StorageService(prefs);
+
+      final themeProvider = ThemeProvider(storageService);
+
+      expect(themeProvider.isDarkMode, false);
+      await themeProvider.toggleTheme(true);
+      expect(themeProvider.isDarkMode, true);
+      expect(storageService.getIsDarkMode(), true);
+    });
   });
 }
