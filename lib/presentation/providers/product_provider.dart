@@ -6,8 +6,8 @@ import '../../data/services/storage_service.dart';
 enum ProductStatus { initial, loading, success, error }
 
 class ProductProvider extends ChangeNotifier {
-  final ProductRepository _repository;
-  final StorageService _storageService;
+  final ProductRepository repository;
+  final StorageService storageService;
 
   ProductStatus _status = ProductStatus.initial;
   String? _errorMessage;
@@ -18,10 +18,9 @@ class ProductProvider extends ChangeNotifier {
   bool _onlyShowFavourites = false;
 
   ProductProvider({
-    required ProductRepository repository,
-    required StorageService storageService,
-  })  : _repository = repository,
-        _storageService = storageService {
+    required this.repository,
+    required this.storageService,
+  }) {
     _loadFavouritesFromStorage();
   }
 
@@ -64,7 +63,7 @@ class ProductProvider extends ChangeNotifier {
   int get favouritesCount => _favouriteIds.length;
 
   void _loadFavouritesFromStorage() {
-    _favouriteIds = _storageService.getFavouriteProductIds().toSet();
+    _favouriteIds = storageService.getFavouriteProductIds().toSet();
   }
 
   Future<void> loadProducts({bool forceRefresh = false}) async {
@@ -73,7 +72,7 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final products = await _repository.getProducts(forceRefresh: forceRefresh);
+      final products = await repository.getProducts(forceRefresh: forceRefresh);
       _allProducts = products;
       _status = ProductStatus.success;
     } catch (e) {
@@ -109,7 +108,7 @@ class ProductProvider extends ChangeNotifier {
     } else {
       _favouriteIds.add(productId);
     }
-    await _storageService.saveFavouriteProductIds(_favouriteIds.toList());
+    await storageService.saveFavouriteProductIds(_favouriteIds.toList());
     notifyListeners();
   }
 

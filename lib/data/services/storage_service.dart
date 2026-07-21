@@ -10,13 +10,13 @@ class StorageService {
 
   // Favourites Persistence
   List<int> getFavouriteProductIds() {
-    final StringList = _prefs.getStringList(_favouritesKey) ?? [];
-    return StringList.map((id) => int.tryParse(id)).whereType<int>().toList();
+    final stringList = _prefs.getStringList(_favouritesKey) ?? [];
+    return stringList.map((id) => int.tryParse(id)).whereType<int>().toList();
   }
 
   Future<bool> saveFavouriteProductIds(List<int> favouriteIds) async {
-    final StringList = favouriteIds.map((id) => id.toString()).toList();
-    return await _prefs.setStringList(_favouritesKey, StringList);
+    final stringList = favouriteIds.map((id) => id.toString()).toList();
+    return await _prefs.setStringList(_favouritesKey, stringList);
   }
 
   // Theme Persistence

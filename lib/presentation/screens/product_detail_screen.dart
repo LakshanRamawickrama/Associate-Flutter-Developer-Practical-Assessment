@@ -165,7 +165,7 @@ class ProductDetailScreen extends StatelessWidget {
                         '\$${product.price.toStringAsFixed(2)}',
                         style: theme.textTheme.headlineMedium?.copyWith(
                           color: colorScheme.primary,
-                          fontWeight: FontWeight.extrabold,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                       const SizedBox(height: 24),

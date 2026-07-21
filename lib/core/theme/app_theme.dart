@@ -41,7 +41,7 @@ class AppTheme {
         fontWeight: FontWeight.bold,
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: surfaceLight,
       elevation: 2,
       shadowColor: Colors.black.withAlpha(20),
@@ -74,7 +74,7 @@ class AppTheme {
       secondaryLabelStyle: const TextStyle(fontSize: 13, color: primaryLight, fontWeight: FontWeight.bold),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      border: Border.all(color: Colors.transparent),
+      side: BorderSide.none,
     ),
   );
 
@@ -102,7 +102,7 @@ class AppTheme {
         fontWeight: FontWeight.bold,
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: surfaceDark,
       elevation: 4,
       shadowColor: Colors.black.withAlpha(80),
@@ -135,7 +135,7 @@ class AppTheme {
       secondaryLabelStyle: const TextStyle(fontSize: 13, color: primaryDark, fontWeight: FontWeight.bold),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      border: Border.all(color: Colors.transparent),
+      side: BorderSide.none,
     ),
   );
 }
