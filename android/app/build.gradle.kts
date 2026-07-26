@@ -7,7 +7,8 @@ plugins {
 android {
     namespace = "com.assessment.product_catalogue"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.2.12479018"
+    buildToolsVersion = "36.0.0"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
